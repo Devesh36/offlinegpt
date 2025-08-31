@@ -1,0 +1,36 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Electron specific build outputs
+out/
+release/
+dist/
+build/
+*.asar
+*.asar.unpacked/
+
+# Operating system and editor specific files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Log files
+logs/
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Test coverage reports
+coverage/
+
+# Temporary files
+tmp/
