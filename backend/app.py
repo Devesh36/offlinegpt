@@ -27,3 +27,7 @@ async def chat(request: Request):
     except Exception as e:
         print("Error contacting llama.cpp server:", e)
         return {"reply": "Error contacting llama.cpp server."}
+
+@app.post("/v1/chat/completions")
+async def chat_completions(request: Request):
+    return await chat(request)

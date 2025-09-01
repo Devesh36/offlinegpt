@@ -34,7 +34,7 @@ export default function Header() {
         <Bars3Icon className="h-5 w-5" />
       </label>
 
-      <div className="grow text-2xl font-bold ml-2">llama.cpp</div>
+      <div className="grow text-2xl font-bold ml-2">Adani</div>
 
       {/* action buttons (top right) */}
       <div className="flex items-center">
@@ -87,6 +87,14 @@ export default function Header() {
           </div>
         </div>
       </div>
+      <header className="app-header">
+        <img
+          src="/adani-logo.png"
+          alt="Adani Power Logo"
+          style={{ height: 40, marginRight: 16 }}
+        />
+        <h1>Adani Power Chat</h1>
+      </header>
     </div>
   );
 }
