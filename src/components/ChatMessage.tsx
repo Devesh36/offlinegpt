@@ -39,7 +39,6 @@ export default function ChatMessage({
 }) {
   const { viewingChat, config } = useAppContext();
   const [editingContent, setEditingContent] = useState<string | null>(null);
-  const [inputValue, setInputValue] = useState('');
   const timings = useMemo(
     () =>
       msg.timings
@@ -87,19 +86,6 @@ export default function ChatMessage({
   if (!viewingChat) return null;
 
   const isUser = msg.role === 'user';
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // Replace with your actual input state
-    const message = inputValue;
-    const res = await fetch('http://localhost:5000/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message }),
-    });
-    const data = await res.json();
-    // Update chat UI with data.reply
-  };
 
   return (
     <div

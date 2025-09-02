@@ -8,7 +8,7 @@ import remarkBreaks from 'remark-breaks';
 import 'katex/dist/katex.min.css';
 import { classNames, copyStr } from '../utils/misc';
 import { ElementContent, Root } from 'hast';
-
+import { visit } from 'unist-util-visit';
 import { useAppContext } from '../utils/app.context';
 import { CanvasType } from '../utils/types';
 import { BtnWithTooltips } from '../utils/common';
@@ -311,7 +311,6 @@ export function escapeBrackets(text: string): string {
     }
   );
 }
-
 
 export function escapeMhchem(text: string) {
   return text.replaceAll('$\\ce{', '$\\\\ce{').replaceAll('$\\pu{', '$\\\\pu{');

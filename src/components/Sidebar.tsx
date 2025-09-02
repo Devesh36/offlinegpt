@@ -15,7 +15,6 @@ import { BtnWithTooltips } from '../utils/common';
 import { useAppContext } from '../utils/app.context';
 import toast from 'react-hot-toast';
 import { useModals } from './ModalProvider';
-import { FaHome, FaChartBar, FaFileAlt, FaExternalLinkAlt } from "react-icons/fa";
 
 export default function Sidebar() {
   const params = useParams();
@@ -48,18 +47,153 @@ export default function Sidebar() {
   );
 
   return (
-    <aside className="sidebar">
-      <h2>Adani Power</h2>
-      <ul>
-        <li className="active"><FaHome /> Dashboard</li>
-        <li><FaChartBar /> Reports</li>
-        <li>
-          <a href="https://www.adanipower.com/" target="_blank" rel="noopener noreferrer">
-            <FaExternalLinkAlt /> Company Website
-          </a>
-        </li>
-      </ul>
-    </aside>
+    <>
+      <input
+        id="toggle-drawer"
+        type="checkbox"
+        className="drawer-toggle"
+        aria-label="Toggle sidebar"
+        defaultChecked
+      />
+
+      <div
+        className="drawer-side h-screen lg:h-screen z-50 lg:max-w-64"
+        role="complementary"
+        aria-label="Sidebar"
+        tabIndex={0}
+      >
+        <label
+          htmlFor="toggle-drawer"
+          aria-label="Close sidebar"
+          className="drawer-overlay"
+        ></label>
+
+        <a
+          href="#main-scroll"
+          className="absolute -left-80 top-0 w-1 h-1 overflow-hidden"
+        >
+          Skip to main content
+        </a>
+
+        <div className="flex flex-col bg-base-200 min-h-full max-w-64 py-4 px-4">
+          <div className="flex flex-row items-center justify-between mb-4 mt-4">
+            <h2 className="font-bold ml-4" role="heading">
+              Conversations
+            </h2>
+
+            {/* close sidebar button */}
+            <label
+              htmlFor="toggle-drawer"
+              className="btn btn-ghost lg:hidden"
+              aria-label="Close sidebar"
+              role="button"
+              tabIndex={0}
+            >
+              <XMarkIcon className="w-5 h-5" />
+            </label>
+          </div>
+
+          {/* new conversation button */}
+          <button
+            className={classNames({
+              'btn btn-ghost justify-start px-2': true,
+              'btn-soft': !currConv,
+            })}
+            onClick={() => navigate('/')}
+            aria-label="New conversation"
+          >
+            <PencilSquareIcon className="w-5 h-5" />
+            New conversation
+          </button>
+
+          {/* list of conversations */}
+          {groupedConv.map((group, i) => (
+            <div key={i} role="group">
+              {/* group name (by date) */}
+              {group.title ? (
+                // we use btn class here to make sure that the padding/margin are aligned with the other items
+                <b
+                  className="btn btn-ghost btn-xs bg-none btn-disabled block text-xs text-base-content text-start px-2 mb-0 mt-6 font-bold"
+                  role="note"
+                  aria-description={group.title}
+                  tabIndex={0}
+                >
+                  {group.title}
+                </b>
+              ) : (
+                <div className="h-2" />
+              )}
+
+              {group.conversations.map((conv) => (
+                <ConversationItem
+                  key={conv.id}
+                  conv={conv}
+                  isCurrConv={currConv?.id === conv.id}
+                  onSelect={() => {
+                    navigate(`/chat/${conv.id}`);
+                  }}
+                  onDelete={async () => {
+                    if (isGenerating(conv.id)) {
+                      toast.error(
+                        'Cannot delete conversation while generating'
+                      );
+                      return;
+                    }
+                    if (
+                      await showConfirm(
+                        'Are you sure to delete this conversation?'
+                      )
+                    ) {
+                      toast.success('Conversation deleted');
+                      StorageUtils.remove(conv.id);
+                      navigate('/');
+                    }
+                  }}
+                  onDownload={() => {
+                    if (isGenerating(conv.id)) {
+                      toast.error(
+                        'Cannot download conversation while generating'
+                      );
+                      return;
+                    }
+                    const conversationJson = JSON.stringify(conv, null, 2);
+                    const blob = new Blob([conversationJson], {
+                      type: 'application/json',
+                    });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `conversation_${conv.id}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  }}
+                  onRename={async () => {
+                    if (isGenerating(conv.id)) {
+                      toast.error(
+                        'Cannot rename conversation while generating'
+                      );
+                      return;
+                    }
+                    const newName = await showPrompt(
+                      'Enter new name for the conversation',
+                      conv.name
+                    );
+                    if (newName && newName.trim().length > 0) {
+                      StorageUtils.updateConversationName(conv.id, newName);
+                    }
+                  }}
+                />
+              ))}
+            </div>
+          ))}
+          <div className="text-center text-xs opacity-40 mt-auto mx-4 pt-8">
+            Conversations are saved to browser's IndexedDB
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
